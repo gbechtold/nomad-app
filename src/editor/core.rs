@@ -8,6 +8,7 @@ pub struct Editor {
     pub status_message: String,
 }
 
+
 impl Editor {
     pub fn new() -> io::Result<Self> {
         Ok(Editor {
