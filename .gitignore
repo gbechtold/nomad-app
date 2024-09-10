@@ -22,3 +22,8 @@ Cargo.lock
 # Ignore OS-specific files
 .DS_Store
 Thumbs.db
+
+
+# Added by cargo
+
+/target

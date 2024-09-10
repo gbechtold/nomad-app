@@ -1,0 +1,13 @@
+src/
+├── main.rs
+├── editor/
+│   ├── mod.rs
+│   ├── core.rs
+│   ├── file_ops.rs
+│   └── ui.rs
+├── llm/
+│   ├── mod.rs
+│   └── llama_model.rs
+└── app/
+    ├── mod.rs
+    └── menu.rs
