@@ -1,6 +1,3 @@
-use super::file_ops::FileOps;
-use super::ui::UI;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
 use std::io;
 
 pub struct Editor {
@@ -22,43 +19,7 @@ impl Editor {
         })
     }
 
-    pub fn run(&mut self) -> io::Result<()> {
-        UI::init()?;
-        loop {
-            UI::refresh_screen(self)?;
-            if self.process_keypress()? {
-                break;
-            }
-        }
-        UI::cleanup()?;
-        Ok(())
-    }
-
-    fn process_keypress(&mut self) -> io::Result<bool> {
-        match event::read()? {
-            Event::Key(KeyEvent { code, modifiers, .. }) => match (code, modifiers) {
-                (KeyCode::Char('q'), KeyModifiers::CONTROL) => return Ok(true),
-                (KeyCode::Char('s'), KeyModifiers::CONTROL) => self.save_file()?,
-                (KeyCode::Char('o'), KeyModifiers::CONTROL) => self.prompt_filename()?,
-                (KeyCode::Char('g'), KeyModifiers::CONTROL) => self.move_cursor_to_end(),
-                (KeyCode::Char('a'), KeyModifiers::CONTROL) => self.move_cursor_to_start(),
-                (KeyCode::Char('k'), KeyModifiers::CONTROL) => self.cut_line(),
-                (KeyCode::Char('u'), KeyModifiers::CONTROL) => self.paste_line(),
-                (KeyCode::Char(c), _) => self.insert_char(c),
-                (KeyCode::Enter, _) => self.insert_newline(),
-                (KeyCode::Left, _) => self.move_cursor_left(),
-                (KeyCode::Right, _) => self.move_cursor_right(),
-                (KeyCode::Up, _) => self.move_cursor_up(),
-                (KeyCode::Down, _) => self.move_cursor_down(),
-                (KeyCode::Backspace, _) => self.delete_char(),
-                _ => {}
-            },
-            _ => {}
-        }
-        Ok(false)
-    }
-
-    fn insert_char(&mut self, c: char) {
+    pub fn insert_char(&mut self, c: char) {
         if self.cursor_y == self.content.len() {
             self.content.push(String::new());
         }
@@ -66,7 +27,7 @@ impl Editor {
         self.move_cursor_right();
     }
 
-    fn insert_newline(&mut self) {
+    pub fn insert_newline(&mut self) {
         if self.cursor_x == self.content[self.cursor_y].len() {
             self.content.insert(self.cursor_y + 1, String::new());
         } else {
@@ -77,7 +38,7 @@ impl Editor {
         self.cursor_x = 0;
     }
 
-    fn delete_char(&mut self) {
+    pub fn delete_char(&mut self) {
         if self.cursor_x > 0 {
             self.content[self.cursor_y].remove(self.cursor_x - 1);
             self.cursor_x -= 1;
@@ -89,7 +50,7 @@ impl Editor {
         }
     }
 
-    fn move_cursor_left(&mut self) {
+    pub fn move_cursor_left(&mut self) {
         if self.cursor_x > 0 {
             self.cursor_x -= 1;
         } else if self.cursor_y > 0 {
@@ -98,7 +59,7 @@ impl Editor {
         }
     }
 
-    fn move_cursor_right(&mut self) {
+    pub fn move_cursor_right(&mut self) {
         if self.cursor_y < self.content.len() && self.cursor_x < self.content[self.cursor_y].len() {
             self.cursor_x += 1;
         } else if self.cursor_y < self.content.len() - 1 {
@@ -107,47 +68,18 @@ impl Editor {
         }
     }
 
-    fn move_cursor_up(&mut self) {
+    pub fn move_cursor_up(&mut self) {
         if self.cursor_y > 0 {
             self.cursor_y -= 1;
             self.cursor_x = self.cursor_x.min(self.content[self.cursor_y].len());
         }
     }
 
-    fn move_cursor_down(&mut self) {
+    pub fn move_cursor_down(&mut self) {
         if self.cursor_y < self.content.len() - 1 {
             self.cursor_y += 1;
             self.cursor_x = self.cursor_x.min(self.content[self.cursor_y].len());
         }
-    }
-
-    fn move_cursor_to_end(&mut self) {
-        self.cursor_y = self.content.len() - 1;
-        self.cursor_x = self.content[self.cursor_y].len();
-    }
-
-    fn move_cursor_to_start(&mut self) {
-        self.cursor_y = 0;
-        self.cursor_x = 0;
-    }
-
-    fn cut_line(&mut self) {
-        if self.cursor_y < self.content.len() {
-            self.content.remove(self.cursor_y);
-            if self.content.is_empty() {
-                self.content.push(String::new());
-            }
-            if self.cursor_y == self.content.len() {
-                self.cursor_y -= 1;
-            }
-            self.cursor_x = 0;
-        }
-    }
-
-    fn paste_line(&mut self) {
-        // This is a simplified paste. In a real implementation, you'd store the cut line.
-        self.content.insert(self.cursor_y, String::new());
-        self.cursor_y += 1;
     }
 
     pub fn get_content(&self) -> String {

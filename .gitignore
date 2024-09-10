@@ -27,3 +27,11 @@ Thumbs.db
 # Added by cargo
 
 /target
+
+# Add these lines to your existing .gitignore file
+
+# Flattened project directory
+/tamed_tree/
+
+# Flatten script
+treetamer.sh

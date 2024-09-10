@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 crossterm = "0.25"
 pulldown-cmark = "0.9"
+tui = { version = "0.19", default-features = false, features = ['crossterm'] }

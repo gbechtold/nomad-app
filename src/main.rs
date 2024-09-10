@@ -1,7 +1,10 @@
 mod editor;
 mod llm;
-mod app;
+mod ui;
 
-fn main() -> std::io::Result<()> {
-    app::run_app()
+use ui::UI;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut ui = UI::new()?;
+    ui.run()
 }

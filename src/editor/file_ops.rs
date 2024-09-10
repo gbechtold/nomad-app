@@ -1,12 +1,11 @@
 use super::core::Editor;
 use std::fs;
 use std::io;
-use std::path::Path;
 
 pub trait FileOps {
     fn load_file(&mut self, filename: &str) -> io::Result<()>;
     fn save_file(&mut self) -> io::Result<()>;
-    fn prompt_filename(&mut self) -> io::Result<()>;
+    fn set_filename(&mut self, filename: String);
 }
 
 impl FileOps for Editor {
@@ -32,17 +31,8 @@ impl FileOps for Editor {
         Ok(())
     }
 
-    fn prompt_filename(&mut self) -> io::Result<()> {
-        let prompt = "Enter filename to save/open: ";
-        let input = super::ui::UI::prompt(self, prompt)?;
-        if !input.is_empty() {
-            if Path::new(&input).exists() {
-                self.load_file(&input)?;
-            } else {
-                self.filename = Some(input);
-                self.status_message = "New file. Use Ctrl-S to save.".to_string();
-            }
-        }
-        Ok(())
+    fn set_filename(&mut self, filename: String) {
+        self.filename = Some(filename);
+        self.status_message = format!("File name set to: {}", self.filename.as_ref().unwrap());
     }
 }
